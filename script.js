@@ -21,9 +21,7 @@ function loadData() {
     $body.append('<img class="bgimg" src="' + streetviewURL + '">');
  
     var urlForArticls = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ cityStr + '&sort=newest&api-key=b96c642b11034eabb9d2917c95481709';
-    $.getJSON(urlForArticls, function(articles) {
-    console.log('success');
-    })
+    $.getJSON(urlForArticls, function(articles) {})
     .done(function(articles, textStatus, jqXHR){
         if(articles.response.docs.length == 0) {
             $($nytHeaderElem).text('No New York Times Articles About ' + cityStr + ' Today.');
@@ -40,6 +38,38 @@ function loadData() {
         console.log(errorThrown.toString());
         $($nytHeaderElem).text('New York Times Articles Could Not Be Loaded');
     });
+    
+    
+
+   // wiki API
+    var urlForWiki = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + cityStr + '&format=json&callback=wikiCallback';
+    $.ajax({
+      url: urlForWiki,
+      dataType: 'jsonp',
+      // jsonp: 'callback'
+      success: function(response){
+        console.log("success");
+        console.log(response[1]);
+        var wikiartikles = response[1];
+        if(wikiartikles.length == 0) {
+           $('#wikipedia-header').text("No Wikipedia Links For " + cityStr);
+        }
+        else {
+        for (var i = 0, n = wikiartikles.length; i < n; i++){
+            var wikiUrl = 'http://en.wikipedia.org/wiki/' + wikiartikles[i];
+            $($wikiElem).append('<li><a href="' + wikiUrl + '" target = "_blank">' + wikiartikles[i] + '</a></li>');
+        }
+        }
+      },
+      fail: function() {
+        console.log("No success");
+      }
+
+       
+
+    });
+
+
 
     return false;
 
