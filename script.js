@@ -19,7 +19,9 @@ function loadData() {
     var streetviewURL = 'http://maps.googleapis.com/maps/api/streetview?size=600x300&location=' + 
     address + '';
     $body.append('<img class="bgimg" src="' + streetviewURL + '">');
- 
+    
+
+    // New York Times API
     var urlForArticls = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q='+ cityStr + '&sort=newest&api-key=b96c642b11034eabb9d2917c95481709';
     $.getJSON(urlForArticls, function(articles) {})
     .done(function(articles, textStatus, jqXHR){
@@ -39,9 +41,14 @@ function loadData() {
         $($nytHeaderElem).text('New York Times Articles Could Not Be Loaded');
     });
     
-    
 
-   // wiki API
+    // wiki API
+    // error handling
+    var wikiRequestTimeout = setTimeout(function(){
+        $wikiElem.text('failed to get wikipedia resources');
+    }, 8000);
+
+   
     var urlForWiki = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + cityStr + '&format=json&callback=wikiCallback';
     $.ajax({
       url: urlForWiki,
@@ -58,15 +65,12 @@ function loadData() {
         for (var i = 0, n = wikiartikles.length; i < n; i++){
             var wikiUrl = 'http://en.wikipedia.org/wiki/' + wikiartikles[i];
             $($wikiElem).append('<li><a href="' + wikiUrl + '" target = "_blank">' + wikiartikles[i] + '</a></li>');
-        }
+        };
+
+        clearTimeout(wikiRequestTimeout);
         }
       },
-      fail: function() {
-        console.log("No success");
-      }
-
-       
-
+    
     });
 
 
